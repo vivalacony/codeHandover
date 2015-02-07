@@ -1,0 +1,85 @@
+{% extends "baseLayout.html" %}
+
+{% block topLink %}
+  <a href='/' class="topbarLink"> Explore</a>
+{% endblock %}
+
+{% block head %}
+    <link href="/static/threadStyle.css" rel="stylesheet">
+    <link href="/static/components.css" rel="stylesheet">
+    <style type="text/css">
+.threadsWrapper{
+  padding-bottom: 0px;
+}
+.recentUploadedProjectsSpan{
+  font-size: 25px;
+  padding-left: 60px;
+  color: rgb(60, 60, 60);
+}
+.selectionList{
+  padding: 10px; 
+  padding-left: 70px;
+  padding-bottom: 40px;
+}
+.selectionList li{
+  padding: 10px; 
+  list-style-type: circle;
+}
+    </style>
+{% endblock %} 
+
+{% block content %}
+<div>
+</div>
+
+<span class="recentUploadedProjectsSpan">All Projects:</span>
+<div class="threadsWrapper">
+{% for project in recentProjects %}
+  <div class="thread">
+    <div class="threadFirstPost clearfix">
+      <div class="threadFirstPostRight clearfix">
+        <div class="threadFirstPostTitle">
+          <span class="threadTitle"><a href="/r/{{ project['projectId'] }}">{{ project['title'] }}</a></span>
+        </div>
+        <div class="threadFirstPostMessage">
+          {{ project['shortDescription'] }}
+        </div>
+      </div>
+    </div>
+  </div><!--/thread-->
+{% endfor %}
+{% for project in recentProjects %}
+  <div class="thread">
+    <div class="threadFirstPost clearfix">
+      <div class="threadFirstPostRight clearfix">
+        <div class="threadFirstPostTitle">
+          <span class="threadTitle"><a href="/r/{{ project['projectId'] }}">{{ project['title'] }}</a></span>
+        </div>
+        <div class="threadFirstPostMessage">
+          {{ project['shortDescription'] }}
+        </div>
+      </div>
+    </div>
+  </div><!--/thread-->
+{% endfor %}
+<div class="pageNumbersCenterHack">
+  <div class="pageNumbersWrapper clearfix">
+    <ul class="pageNumbers clearfix">
+      {% if pageButtons %}
+        <li class="pageNumber clearfix">Pages: </li>
+        {% for pageButton in pageButtons %}
+          <li class="pageNumber clearfix">
+            {% if pageButton.active == 'True' %}
+              <a href="/page/{{ pageButton.number }}" class="active">{{ pageButton.number }}</a>
+            {% else %}
+              <a href="/page/{{ pageButton.number }}">{{ pageButton.number }}</a>
+            {% endif %}
+          </li>
+        {% endfor %}
+      {% endif %}
+    </ul>
+  </div>
+</div>
+
+</div><!--/threadsWrapper--> 
+{% endblock %}
