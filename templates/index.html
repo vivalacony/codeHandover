@@ -48,20 +48,6 @@
     </div>
   </div><!--/thread-->
 {% endfor %}
-{% for project in recentProjects %}
-  <div class="thread">
-    <div class="threadFirstPost clearfix">
-      <div class="threadFirstPostRight clearfix">
-        <div class="threadFirstPostTitle">
-          <span class="threadTitle"><a href="/r/{{ project['projectId'] }}">{{ project['title'] }}</a></span>
-        </div>
-        <div class="threadFirstPostMessage">
-          {{ project['shortDescription'] }}
-        </div>
-      </div>
-    </div>
-  </div><!--/thread-->
-{% endfor %}
 <div class="pageNumbersCenterHack">
   <div class="pageNumbersWrapper clearfix">
     <ul class="pageNumbers clearfix">

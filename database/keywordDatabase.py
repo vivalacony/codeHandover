@@ -1,15 +1,15 @@
 import redis
 
-keyFormat = 'tag_{0}'
-tagRedisDB = redis.StrictRedis( '127.0.0.1', 6379 )
+keyFormat = 'keyword_{0}'
+keywordRedisDB = redis.StrictRedis( '127.0.0.1', 6379 )
 
-def addTagsToProject( projectId, tagsList ):
+def addKeywordsToProject( projectId, tagsList ):
   if isinstance( tagsList, basestring):#if a string is passed in convert it to a list of one element
     tagsList = [ tagsList ]
 
   for tag in tagsList:
     key = _tagKey(tag)
-    tagRedisDB.sadd( key, projectId )
+    keywordRedisDB.sadd( key, projectId )
 
 def getIntersection( keywords ):
   fixed = []
@@ -17,7 +17,7 @@ def getIntersection( keywords ):
     key = _tagKey( keyword )
     fixed.append( key )
 
-  return tagRedisDB.sinter( fixed )
+  return keywordRedisDB.sinter( fixed )
 
 def removeFileIdFromTag( projectId, tag ):
   #TODO: what happens if it doesn't exist ??
@@ -26,7 +26,7 @@ def removeFileIdFromTag( projectId, tag ):
 
 def getMatchingProjects( keyword ):
   key = _tagKey(keyword)
-  return tagRedisDB.smembers( key )
+  return keywordRedisDB.smembers( key )
 
 def _tagKey(tag):
   return keyFormat.format(tag)
