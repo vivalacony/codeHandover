@@ -3,17 +3,20 @@ import redis
 keyFormat = 'project_{0}'
 projectRedisDB = redis.StrictRedis( '127.0.0.1', 6379 )#TODO: move to config file
 
-def addNewProject(projectId, creatorId, title, shortDescription, 
-					longDescription, gitUrl, wikiUrl, attachedFileId, tags):
+def addNewProject(secretUrl, projectId, title, Author, SourceCode, Description, Input, Output, 
+					Requirements,Usage,Example, tags):
 	projectInfo = {
-		'projectId': 		 projectId,
-		'title': 			 title,
-		'shortDescription':  shortDescription,
-		'longDescription': 	 longDescription,
-		'gitUrl': 			 gitUrl,
-		'wikiUrl': 			 wikiUrl,
-		'creatorId': 		 creatorId,
-		'attachedPictureId': attachedFileId
+		'secretUrl': secretUrl,
+		'projectId': projectId,
+		'title': title,
+		'Author': Author,
+		'SourceCode': SourceCode,
+		'Description': Description,
+		'Input': Input,
+		'Output': Output,
+		'Requirements': Requirements,
+		'Usage': Usage,
+		'Example': Example
 	}
 	key = _projectKey(projectId)
 	projectRedisDB.hmset(key+'_info', projectInfo)

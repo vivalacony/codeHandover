@@ -32,8 +32,8 @@
 <div>
 </div>
 
-<span class="recentUploadedProjectsSpan">All Projects:</span>
 <div class="threadsWrapper">
+<span class="recentUploadedProjectsSpan">All Projects:</span>
 {% for project in recentProjects %}
   <div class="thread">
     <div class="threadFirstPost clearfix">
@@ -42,7 +42,7 @@
           <span class="threadTitle"><a href="/r/{{ project['projectId'] }}">{{ project['title'] }}</a></span>
         </div>
         <div class="threadFirstPostMessage">
-          {{ project['shortDescription'] }}
+          {{ project['Description'] }}
         </div>
       </div>
     </div>

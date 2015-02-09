@@ -14,6 +14,14 @@ def addUser(userId, email, username, passwordHash, apiKey, isAdmin):
   key = _activeKey(userId)
   activeRedisDB.hmset(key, user)
 
+def changeUsername(userId, newUsername):
+  key = _activeKey(userId)
+  activeRedisDB.hset(key, 'username', newUsername)
+
+def changePasswordHash(userId, newPasswordHash):
+  key = _activeKey(userId)
+  activeRedisDB.hset(key, 'passwordHash', newPasswordHash)
+
 def removeUser(userId):
   key = _activeKey(userId)
   activeRedisDB.delete(key)

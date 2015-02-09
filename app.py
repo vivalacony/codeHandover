@@ -11,23 +11,28 @@ postRedisDB = redis.StrictRedis( '127.0.0.1', 6379 )
 postRedisDB.flushall()
 databaseFunctions.createAdminAccount()
 
-projectId = databaseFunctions.addNewProject("user_id_02", "Some Project About Something", 
-	"dicta sunt explicabo."+
-	" illum qui dolorem eum fugiat quo voluptas nulla pariatur?", "",
-	 "http://github.com/something", "http://wiki.com/somethingElse", 
-	 "file_id_001", [ "something", "cats", "nothing", "Ireland", "vague" ])
+projectId = databaseFunctions.addNewProject('secretUrl', 'title', 'Author', 'SourceCode', 'Description', 
+											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
+projectId = databaseFunctions.addNewProject('secretUrl', 'title', 'Author', 'SourceCode', 'Description', 
+											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
+projectId = databaseFunctions.addNewProject('secretUrl', 'title', 'Author', 'SourceCode', 'Description', 
+											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
+projectId = databaseFunctions.addNewProject('secretUrl', 'title', 'Author', 'SourceCode', 'Description', 
+											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
+projectId = databaseFunctions.addNewProject('secretUrl', 'title', 'Author', 'SourceCode', 'Description', 
+											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
+projectId = databaseFunctions.addNewProject('secretUrl', 'title', 'Author', 'SourceCode', 'Description', 
+											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
+projectId = databaseFunctions.addNewProject('secretUrl', 'title', 'Author', 'SourceCode', 'Description', 
+											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
+projectId = databaseFunctions.addNewProject('secretUrl', 'title', 'Author', 'SourceCode', 'Description', 
+											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
+projectId = databaseFunctions.addNewProject('secretUrl', 'title', 'Author', 'SourceCode', 'Description', 
+											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
+projectId = databaseFunctions.addNewProject('secretUrl', 'title', 'Author', 'SourceCode', 'Description', 
+											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
 
-projectId = databaseFunctions.addNewProject("user_id_02", "A big long project", 
-	"dicta sunt explicabo."+
-	"qui in ea voluptate velit esse quam nihil molestiae consequatur, vel"+
-	" illum qui dolorem eum fugiat quo voluptas nulla pariatur?", "",
-	 "http://github.com/something", "http://wiki.com/somethingElse", 
-	 "file_id_001", [ "Ireland", "USA", "london" ])
 
-projectId = databaseFunctions.addNewProject("user_id_02", "Cat Chat", 
-	"in rescue centres throughout the UK and Ireland", "",
-	 "http://github.com/something", "http://wiki.com/somethingElse", 
-	 "file_id_001", [ "cats", "chat", "mice", "Ireland" ])
 
 databaseFunctions.addPendingUser('tom@example.com', 'pippy360', 'password')
 
@@ -78,17 +83,43 @@ def showSearchPage(query, pageNo):
 	
 	return render_template("search.html")
 
+@app.route('/acceptUser/<userId>')
+@login.login_required
+def acceptUserPage(userId):
+	if login.current_user.isAdmin == 'False':
+		return redirect('/')
+
+	databaseFunctions.moveFromPendingToActive(userId)
+	return redirect('/dashboard?success=Success: User Accepted')
+
+@app.route('/rejectUser/<userId>')
+@login.login_required
+def rejectUserPage(userId):
+	if login.current_user.isAdmin == 'False':
+		return redirect('/')
+
+	databaseFunctions.removePendingUser(userId)
+	return redirect('/dashboard?success=Success: User Rejected')
+
+@app.route("/api/<projectTitle>/")
+def projectTitlePage(projectTitle):
+	#get the apiKey from the get request and revese proxy the url
+	return redirect('/')
+
 @app.route("/r/<projectId>")
 @app.route("/r/<projectId>/")
 @login.login_required
 def showProject(projectId):
-	return showIndex()
-	#return render_template("index.html")
+	projectInfo = databaseFunctions.getProjectInfo(projectId)
+	return render_template("project.html", projectInfo=projectInfo)
 
 #TODO: allow editing of projects
 @app.route("/r/<projectId>/edit", methods=['POST'])
 @login.login_required
 def editProject(projectId):
+	if not login.current_user.isAdmin:
+		return redirect('/')
+
 	if request.form.get('postContent'):
 		pass
 	else:
@@ -104,6 +135,11 @@ def projectSubmit():
 		return redirect('/thread/'+threadId)
 	else:
 		return redirect('/')#pass it here and pass on an error message
+
+@app.route('/logout')
+def logoutPage(errors=[]):
+	login.logout_user()
+	return redirect('/')
 
 @app.route('/login')
 def loginPage(errors=[]):
@@ -137,7 +173,7 @@ def dashboardPage(errors=[]):
 	if request.args.get('success') != None:
 		errors = [{'message':request.args.get('success'),'class':'bg-success'}]
 	
-	if login.current_user.isAdmin:
+	if login.current_user.isAdmin == 'True':
 		pendingUsers = []
 		pendingUsers = databaseFunctions.getAllPendingUsers()
 	else:
@@ -159,12 +195,20 @@ def changeUsernameSubmitPage(errors=[]):
 	if request.args.get('error') != None:
 		errors = [{'message':request.args.get('error'),'class':'bg-danger'}]
 
+	#FIXME: make sure the username is a valid username
 	if request.form.get('username') != None:
-	#	return redirect('/dashboard?success=Success: Username Changed to '+newUsername)
+		databaseFunctions.changeUsername(login.current_user.userId, request.form.get('username'))
+		return redirect('/dashboard?success=Success: Username Changed to '+request.form.get('username'))
 	else:
 		return redirect('/dashboard?error=Error: Username Change Failed, darn it :(')
 		
+@app.route('/apiKeyDocs')
+@login.login_required
+def apiKeyDocsPage(errors=[]):
+	if request.args.get('error') != None:
+		errors = [{'message':request.args.get('error'),'class':'bg-danger'}]
 
+	return render_template("docs.html", errors=errors)
 
 @app.route('/changePassword')
 @login.login_required
@@ -179,8 +223,25 @@ def changePasswordPage(errors=[]):
 def changePasswordSubmitPage(errors=[]):
 	if request.args.get('error') != None:
 		errors = [{'message':request.args.get('error'),'class':'bg-danger'}]
+	
+	if (request.form.get('oldpassword') != None and request.form.get('password') != None 
+			and request.form.get('passwordAgain') != None):
+		oldPassword  = request.form.get('oldpassword')
+		newPassword1 = request.form.get('password')
+		newPassword2 = request.form.get('passwordAgain')
 
-	return redirect('/dashboard?success=Success: Password Changed')
+		oldPasswordHash = oldPassword;
+		if oldPasswordHash != login.current_user.passwordHash:#the old password
+			return redirect('/changePassword?error=Error: Wrong Old password.')
+		elif newPassword1 != newPassword2:
+			return redirect('/changePassword?error=Error: New Passwords didn\'t Match')
+
+		newPasswordHash = newPassword1
+
+		databaseFunctions.changePasswordHash(login.current_user.userId, newPasswordHash)
+		return redirect('/dashboard?success=Success: Password Changed')
+	else:
+		return redirect('/dashboard?error=Error: Password Change Failed, darn it :(')
 
 
 @app.route("/signupSubmit", methods=['POST'])

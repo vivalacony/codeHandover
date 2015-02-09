@@ -7,16 +7,16 @@ import userDatabase
 import usernameDatabase
 import emailDatabase
 
-def addNewProject(creatorId, title, shortDescription, longDescription, 
-				gitUrl, wikiUrl, attachedFileId, tags):
+def addNewProject(secretUrl, title, Author, SourceCode, Description, Input, Output, 
+					Requirements,Usage,Example, tags, keywords):
 	#TODO: replace with get threadId()
 	projectId = getNewId()
-	projectDatabase.addNewProject(projectId, creatorId, title, shortDescription, 
-		longDescription, gitUrl, wikiUrl, attachedFileId, tags);
+	projectDatabase.addNewProject(secretUrl, projectId, title, Author, SourceCode, Description, Input, Output, 
+									Requirements,Usage,Example, tags);
 	globalDatabase.addProjectIdToProjectList(projectId)
 	tagDatabase.addTagsToProject(projectId, tags)
+	#TODO: put keyword database stuff here
 	return projectId
-
 #function should be run whenever redis database is cleared
 #or when you move server ect.
 def createAdminAccount():
@@ -25,6 +25,23 @@ def createAdminAccount():
 	usernameDatabase.addUsername('admin', userId)
 	userDatabase.addUser(userId, 'Admin@admin.com', 'Admin', 
 							'password', '240952', True)
+
+def changeUsername(userId, newUsername):
+	userInfo = userDatabase.getUserInfo(userId)
+	print 'userInfo'
+	print userInfo
+	usernameDatabase.removeUsername( userInfo['username'] )
+	userDatabase.changeUsername(userId, newUsername)
+	usernameDatabase.addUsername(newUsername, userId)
+
+def changePasswordHash(userId, newPasswordHash):
+	userDatabase.changePasswordHash(userId, newPasswordHash)
+
+def removePendingUser(userId):
+	userInfo = pendingUserDatabase.getUserInfo(userId)
+	pendingUserDatabase.removeUser(userId)
+	emailDatabase.removeEmail(userInfo['email'])
+	usernameDatabase.removeUsername(userInfo['username'])
 
 def getUsernameUserId(username):
 	return usernameDatabase.getUsernameUserId(username)
@@ -74,7 +91,8 @@ def moveFromPendingToActive(userId):
 	apiKey = '2000143204234' + getNewId()#lol security
 	userInfo = pendingUserDatabase.getUserInfo(userId)
 	pendingUserDatabase.removeUser(userId)
-	userDatabase.addUser(userId, email, username, passwordHash, apiKey, False)
+	userDatabase.addUser(userId, userInfo['email'], userInfo['username'],
+						 userInfo['passwordHash'], apiKey, False)
 
 def getAllPendingUsers():
 	result = []

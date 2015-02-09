@@ -20,7 +20,7 @@ class User(object):
 		return True
 
 	def is_active(self):
-		return True
+		return self.isActiveVar
 
 	def is_anonymous(self):
 		return False
@@ -68,6 +68,10 @@ def loginUser(userStringId, password):
 	print userId
 	
 	tempUser = getUserFromId(userId)
+	if not tempUser.is_active():
+		status['reason'] = 'Error: You registration has not been accepted yet.'
+		return status
+
 	hashedPassword = password#plain text
 
 	if not hashedPassword == tempUser.passwordHash:

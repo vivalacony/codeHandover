@@ -55,19 +55,12 @@ tr{
 .listOfFeatures input{
 	padding: 5px;
 	margin-left: 20px;
-	width: 300px;
+	width: 200px;
 }
 li{
 	text-align: left;
 }
 .contentsWrapper{
-}
-.contents input{
-	display: block;
-	margin: 15px;
-	padding: 10px;
-	border: 1px solid rgba(0,0,0,0.3);
-	border-radius: 2px;
 }
 </style>
 {% endblock %}
@@ -75,15 +68,7 @@ li{
 {% block content %}
 <div class="contentsWrapper">
 	<div class="contents">
-		<div>
-			<h1 class="listOfFeatures">Change Password</h1>
-			<form action="/changePasswordSubmit" method="post">
-			<input name="oldpassword" placeholder="Old Password" type="password">
-			<input name="password" placeholder="New Password" type="password">
-			<input name="passwordAgain" placeholder="New Password Again" type="password">
-			<input type="submit">
-			</form>
-		</div>
+		{{projectInfo}}
 	</div>
 </div>
 {% endblock %}

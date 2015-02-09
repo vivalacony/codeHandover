@@ -1,6 +1,8 @@
 .threadsWrapper{
   padding-top: 10px;
   padding-bottom: 100px;
+  margin: auto;
+  width: 800px;
 }
 .thread{
   margin-left: 50px;
