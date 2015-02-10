@@ -7,16 +7,25 @@ import userDatabase
 import usernameDatabase
 import emailDatabase
 
-def addNewProject(secretUrl, title, Author, SourceCode, Description, Input, Output, 
+def addNewProject(secretUrl, Uname, title, Author, SourceCode, Description, Input, Output, 
 					Requirements,Usage,Example, tags, keywords):
 	#TODO: replace with get threadId()
 	projectId = getNewId()
-	projectDatabase.addNewProject(secretUrl, projectId, title, Author, SourceCode, Description, Input, Output, 
-									Requirements,Usage,Example, tags);
+	projectDatabase.addNewProject(secretUrl, Uname, projectId, title, Author, SourceCode, Description, Input, Output, 
+									Requirements,Usage,Example, tags)
 	globalDatabase.addProjectIdToProjectList(projectId)
 	tagDatabase.addTagsToProject(projectId, tags)
 	#TODO: put keyword database stuff here
 	return projectId
+
+def editProject(projectId, secretUrl, Uname, title, Author, SourceCode, Description, Input, Output, 
+					Requirements,Usage,Example, tags, keywords):
+	projectDatabase.addNewProject(secretUrl, Uname, projectId, title, Author, SourceCode, 
+								Description, Input, Output, Requirements,Usage,Example, tags);
+	#FIXME: hm.....you should really remove all the old tags.....
+	tagDatabase.addTagsToProject(projectId, tags)
+	return 
+
 #function should be run whenever redis database is cleared
 #or when you move server ect.
 def createAdminAccount():

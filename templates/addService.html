@@ -1,0 +1,178 @@
+{% extends "baseLayout.html" %}
+
+{% block topLink %}
+{% endblock %}
+
+{% block head %}
+<style>
+.contentsWrapper{
+
+}
+.contents{
+	margin: auto;
+	max-width: 600px;
+	text-align: center;
+	padding: 40px;
+	padding-bottom: 100px;
+	background-color: rgba(200,200,200,.3);
+	border-radius: 4px;
+}
+.formInputLabel{
+	display: block;
+	font-size: 18px;
+	margin: 5px;
+	float: left;
+	padding-left: 18px;
+}
+.formInput{
+	font-size: 18px;
+	padding: 5px 10px;
+}
+.formSubmitButton{
+	display: block;
+	font-size: 18px;
+	position: relative;
+	left: 0px;
+	top: 15px;
+	margin: 5px;
+	padding: 5px;
+	border: 1px solid black;
+	float: right;
+	cursor: pointer;
+}
+th{
+	text-align: left;
+}
+tr{
+	text-align: left;
+}
+.listOfFeatures{
+	text-align: center;
+}
+.listOfFeatures li{
+	padding: 8px;
+}
+.listOfFeatures input{
+	padding: 5px;
+	margin-left: 20px;
+	width: 200px;
+}
+li{
+	text-align: left;
+}
+.contents{
+}
+.formInputWithLableWrapper{
+	margin-top: 20px;
+}
+.formInputWithLableWrapper .inputLable{
+	padding: 10px;
+	padding-bottom: 15px;
+	font-size: 18px;
+	color: rgba(0,0,0,.8);
+}
+.formInputWithLableWrapper input{
+	border-radius: 5px;
+	border: 0px;
+	padding: 10px;
+	font-size: 18px;
+	width: 95%;
+}
+.formInputWithLableWrapper textarea{
+	border-radius: 5px;
+	border: 0px;
+	width:	95%;
+	height: 100px;
+}
+div, span{
+	font-family: "freightsans_regular", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+}
+h1{
+	font-weight: normal;
+	color: rgba(0,0,0,.8);
+}
+.submitButtom{
+	padding: 16px 30px 40px 30px;
+	width: 256px;
+	height: 24px;
+	font-size: 20px;
+	display: block;
+	margin: auto;
+	margin-top: 50px;
+	border: 0px;
+	border-radius: 5px;
+	color: white;
+	background-color: #ee6557;
+	cursor: pointer;
+	  -webkit-transition: all .275s ease-in-out;
+	  -moz-transition: all .275s ease-in-out;
+	  -o-transition: all .275s ease-in-out;
+	  transition: all .275s ease-in-out;
+}
+.submitButtom:hover{
+	background-color: black;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="contentsWrapper">
+	<div class="contents">
+		<div>
+			<form action="/{{formAction}}" method="post">
+				<h1 class="listOfFeatures">Add Web Service</h1>
+				<input type="hidden" name="existingId" value="{{serviceInfo.id}}">
+				<div class="formInputWithLableWrapper">
+					<div class="inputLable">Unique Name - The name used to Id the service when using the API</div>
+					<input placeholder="Unique Name" value="{{serviceInfo.Uname}}" name="uname" type="text" class="formInput">
+				</div>
+				<div class="formInputWithLableWrapper">
+					<div class="inputLable">Service Url - The Url of the Web Service </div>
+					<input placeholder="Service Url" value="{{serviceInfo.secretUrl}}"  name="serviceurl" type="text" class="formInput">
+				</div>
+				<div class="formInputWithLableWrapper">
+					<div class="inputLable">Title</div>
+					<input placeholder="Title" value="{{serviceInfo.title}}" name="title" type="text" class="formInput">
+				</div>
+				<div class="formInputWithLableWrapper">
+					<div class="inputLable">Author</div>
+					<textarea name="Author" type="text" class="formInput">{{serviceInfo.Author}}</textarea>
+				</div>
+				<div class="formInputWithLableWrapper">
+					<div class="inputLable">Source Code</div>
+					<textarea name="sourcecode" type="text" class="formInput">{{serviceInfo.SourceCode}}</textarea>
+				</div>
+				<div class="formInputWithLableWrapper">
+					<div class="inputLable">Description</div>
+					<textarea name="description" type="text" class="formInput">{{serviceInfo.Description}}</textarea>
+				</div>
+				<div class="formInputWithLableWrapper">
+					<div class="inputLable">Input</div>
+					<textarea name="input" type="text" class="formInput">{{serviceInfo.Input}}</textarea>
+				</div>
+				<div class="formInputWithLableWrapper">
+					<div class="inputLable">Output</div>
+					<textarea name="output" type="text" class="formInput">{{serviceInfo.Output}}</textarea>
+				</div>
+				<div class="formInputWithLableWrapper">
+					<div class="inputLable">Requirements</div>
+					<textarea name="requirements" type="text" class="formInput">{{serviceInfo.Requirements}}</textarea>
+				</div>
+				<div class="formInputWithLableWrapper">
+					<div class="inputLable">Usage</div>
+					<textarea name="usage" type="text" class="formInput">{{serviceInfo.Usage}}</textarea>
+				</div>
+				<div class="formInputWithLableWrapper">
+					<div class="inputLable">Example</div>
+					<textarea name="example" type="text" class="formInput">{{serviceInfo.Example}}</textarea>
+				</div>
+				<div class="formInputWithLableWrapper">
+					<div class="inputLable">Tags - space (" ") seperated</div>
+					<input placeholder="Tags"  name="serviceurl" type="text" class="formInput">
+				</div>
+				<input type="submit" value="Done! Submit It" class="submitButtom">
+			</form>
+		</div>
+	</div>
+</div>
+{% endblock %}

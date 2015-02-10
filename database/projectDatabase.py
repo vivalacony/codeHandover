@@ -3,9 +3,10 @@ import redis
 keyFormat = 'project_{0}'
 projectRedisDB = redis.StrictRedis( '127.0.0.1', 6379 )#TODO: move to config file
 
-def addNewProject(secretUrl, projectId, title, Author, SourceCode, Description, Input, Output, 
+def addNewProject(secretUrl, Uname, projectId, title, Author, SourceCode, Description, Input, Output, 
 					Requirements,Usage,Example, tags):
 	projectInfo = {
+		'Uname':  Uname,
 		'secretUrl': secretUrl,
 		'projectId': projectId,
 		'title': title,

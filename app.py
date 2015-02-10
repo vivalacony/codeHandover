@@ -11,25 +11,25 @@ postRedisDB = redis.StrictRedis( '127.0.0.1', 6379 )
 postRedisDB.flushall()
 databaseFunctions.createAdminAccount()
 
-projectId = databaseFunctions.addNewProject('secretUrl', 'title', 'Author', 'SourceCode', 'Description', 
+projectId = databaseFunctions.addNewProject('secretUrl', 'Uname', 'title', 'Author', 'SourceCode', 'Description', 
 											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
-projectId = databaseFunctions.addNewProject('secretUrl', 'title', 'Author', 'SourceCode', 'Description', 
+projectId = databaseFunctions.addNewProject('secretUrl', 'Uname', 'title', 'Author', 'SourceCode', 'Description', 
 											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
-projectId = databaseFunctions.addNewProject('secretUrl', 'title', 'Author', 'SourceCode', 'Description', 
+projectId = databaseFunctions.addNewProject('secretUrl', 'Uname', 'title', 'Author', 'SourceCode', 'Description', 
 											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
-projectId = databaseFunctions.addNewProject('secretUrl', 'title', 'Author', 'SourceCode', 'Description', 
+projectId = databaseFunctions.addNewProject('secretUrl', 'Uname', 'title', 'Author', 'SourceCode', 'Description', 
 											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
-projectId = databaseFunctions.addNewProject('secretUrl', 'title', 'Author', 'SourceCode', 'Description', 
+projectId = databaseFunctions.addNewProject('secretUrl', 'Uname', 'title', 'Author', 'SourceCode', 'Description', 
 											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
-projectId = databaseFunctions.addNewProject('secretUrl', 'title', 'Author', 'SourceCode', 'Description', 
+projectId = databaseFunctions.addNewProject('secretUrl', 'Uname', 'title', 'Author', 'SourceCode', 'Description', 
 											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
-projectId = databaseFunctions.addNewProject('secretUrl', 'title', 'Author', 'SourceCode', 'Description', 
+projectId = databaseFunctions.addNewProject('secretUrl', 'Uname', 'title', 'Author', 'SourceCode', 'Description', 
 											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
-projectId = databaseFunctions.addNewProject('secretUrl', 'title', 'Author', 'SourceCode', 'Description', 
+projectId = databaseFunctions.addNewProject('secretUrl', 'Uname', 'title', 'Author', 'SourceCode', 'Description', 
 											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
-projectId = databaseFunctions.addNewProject('secretUrl', 'title', 'Author', 'SourceCode', 'Description', 
+projectId = databaseFunctions.addNewProject('secretUrl', 'Uname', 'title', 'Author', 'SourceCode', 'Description', 
 											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
-projectId = databaseFunctions.addNewProject('secretUrl', 'title', 'Author', 'SourceCode', 'Description', 
+projectId = databaseFunctions.addNewProject('secretUrl', 'Uname', 'title', 'Author', 'SourceCode', 'Description', 
 											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
 
 
@@ -83,6 +83,87 @@ def showSearchPage(query, pageNo):
 	
 	return render_template("search.html")
 
+@app.route('/addService')
+@login.login_required
+def addServicePage():
+	if login.current_user.isAdmin == 'False':
+		return redirect('/')
+
+	return render_template('addService.html', serviceInfo={}, formAction="addServiceSubmit")
+
+@app.route('/addServiceSubmit', methods=['POST'])
+@login.login_required
+def addServiceSubmitPage():
+	if login.current_user.isAdmin == 'False':
+		return redirect('/')
+
+	print 'request.form'
+	print request.form
+
+	#FIXME: check valid title
+	if (len(request.form.get('title')) > 0 and len(request.form.get('serviceurl')) > 0
+			and len(request.form.get('uname')) > 0):
+		databaseFunctions.addNewProject(
+			request.form.get('secreturl'), 
+			request.form.get('uname'), 
+			request.form.get('title'), 
+			request.form.get('Author'), 
+			request.form.get('sourcecode'), 				
+			request.form.get('description'), 
+			request.form.get('input'), 
+			request.form.get('output'), 
+			request.form.get('requirements'),
+			request.form.get('usage'),
+			request.form.get('example'), 
+			[], 
+			[])
+		return redirect('/dashboard?success=Success: Service Added')
+	else:
+		return redirect('/addService?error=Error: Bad Title')
+
+@app.route('/editService/<serviceId>')
+@login.login_required
+def editServicePage(serviceId):
+	if login.current_user.isAdmin == 'False':
+		return redirect('/')
+
+	serviceInfo = databaseFunctions.getProjectInfo(serviceId)
+	serviceInfo['id'] = serviceId
+	return render_template('addService.html', serviceInfo=serviceInfo, formAction="editServiceSubmit")
+
+@app.route('/editServiceSubmit', methods=['POST'])
+@login.login_required
+def editServiceSubmitPage():
+	if login.current_user.isAdmin == 'False':
+		return redirect('/')
+
+	databaseFunctions.editProject(
+			request.form.get('existingId'),
+			request.form.get('secreturl'), 
+			request.form.get('uname'), 
+			request.form.get('title'), 
+			request.form.get('Author'), 
+			request.form.get('sourcecode'), 				
+			request.form.get('description'), 
+			request.form.get('input'), 
+			request.form.get('output'), 
+			request.form.get('requirements'),
+			request.form.get('usage'),
+			request.form.get('example'), 
+			[], 
+			[])
+
+	return redirect('/dashboard?success=Success: Service Edited')
+
+@app.route('/removeService/<serviceId>')
+@login.login_required
+def removeServicePage(serviceId):
+	if login.current_user.isAdmin == 'False':
+		return redirect('/')
+
+	return redirect('/dashboard?success=Success: Service Added')
+
+
 @app.route('/acceptUser/<userId>')
 @login.login_required
 def acceptUserPage(userId):
@@ -124,17 +205,6 @@ def editProject(projectId):
 		pass
 	else:
 		pass
-
-@app.route('/projectSubmit', methods=['POST'])
-@login.login_required
-def projectSubmit():
-	threadId = ''
-	if request.form.get('subject') != None and request.form.get('comment') != None:
-		threadId = databaseFunctions.createThread(boardId, request.form['subject'], 
-			request.form['comment'], request)
-		return redirect('/thread/'+threadId)
-	else:
-		return redirect('/')#pass it here and pass on an error message
 
 @app.route('/logout')
 def logoutPage(errors=[]):
