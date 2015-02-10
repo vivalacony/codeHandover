@@ -11,7 +11,6 @@
 .contents{
 	margin: auto;
 	max-width: 600px;
-	text-align: center;
 	padding: 40px;
 	padding-bottom: 100px;
 	background-color: rgba(200,200,200,.3);
@@ -62,13 +61,45 @@ li{
 }
 .contentsWrapper{
 }
+.serviceTitle{
+	border-bottom: 1px solid rgba(0,0,0,.5);
+	display: block;
+	width: 100%;
+	color: rgba(0,0,0,.7);
+	font-size: 18px;
+}
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="contentsWrapper">
-	<div class="contents">
-		{{projectInfo}}
+
+<div class="contents">
+		<ul class="menuList">
+			<li><a href="#"><span class="liMenuNumber">1</span><span>Author</span></a></li>
+			<li><a href="#"><span class="liMenuNumber">2</span><span>Source Code</span></a></li>
+			<li><a href="#"><span class="liMenuNumber">3</span><span>Description</span></a></li>
+			<li><a href="#"><span class="liMenuNumber">4</span><span>Input</span></a></li>
+			<li><a href="#"><span class="liMenuNumber">5</span><span>Output</span></a></li>
+			<li><a href="#"><span class="liMenuNumber">6</span><span>Requirements</span></a></li>
+			<li><a href="#"><span class="liMenuNumber">7</span><span>Usage</span></a></li>
+			<li><a href="#"><span class="liMenuNumber">8</span><span>Example</span></a></li>
+			<li><a href="#"><span class="liMenuNumber">9</span><span>Keywords and Categories</span></a></li>
+		</ul>
+
+		<div><span class="serviceTitle">Api</span><p>/api/{{ projectInfo.Uname }}</p></div>
+		<div><span class="serviceTitle">title</span><p>{{ projectInfo.title }}</p></div>
+		<div><span class="serviceTitle">Uname</span><p>{{ projectInfo.Uname }}</p></div>
+		<div><span class="serviceTitle">Author</span><p>{{ projectInfo.Author }}</p></div>
+		<div><span class="serviceTitle">SourceCode</span><p>{{ projectInfo.SourceCode }}</p></div>
+		<div><span class="serviceTitle">Description</span><p>{{ projectInfo.Description }}</p></div>
+		<div><span class="serviceTitle">Input</span><p>{{ projectInfo.Input }}</p></div>
+		<div><span class="serviceTitle">Output</span><p>{{ projectInfo.Output }}</p></div>
+		<div><span class="serviceTitle">Requirements</span><p>{{ projectInfo.Requirements }}</p></div>
+		<div><span class="serviceTitle">Usage</span><p>{{ projectInfo.Usage }}</p></div>
+		<div><span class="serviceTitle">Example</span><p>{{ projectInfo.Example }}</p></div>
+		<div><span class="serviceTitle">Tags</span><p>{{ projectInfo.tags }}</p></div>
 	</div>
+
 </div>
 {% endblock %}
