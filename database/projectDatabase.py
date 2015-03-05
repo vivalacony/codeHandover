@@ -24,6 +24,11 @@ def addNewProject(secretUrl, Uname, projectId, title, Author, SourceCode, Descri
 	for tag in tags:
 		projectRedisDB.sadd(key+'_tags', tag)
 
+def removeProject(projectId):
+	key = _projectKey(projectId)
+	projectRedisDB.delete(key+'_info')
+	projectRedisDB.delete(key+'_tags')
+
 def getProjectInfo(projectId):
 	key = _projectKey(projectId)
 	result = projectRedisDB.hgetall(key+'_info')

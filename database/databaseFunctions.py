@@ -1,3 +1,5 @@
+import random
+import string
 import globalDatabase
 import projectDatabase
 import fileDatabase
@@ -6,6 +8,7 @@ import pendingUserDatabase
 import userDatabase
 import usernameDatabase
 import emailDatabase
+from werkzeug.security import generate_password_hash, check_password_hash
 
 def addNewProject(secretUrl, Uname, title, Author, SourceCode, Description, Input, Output, 
 					Requirements,Usage,Example, tags, keywords):
@@ -26,14 +29,28 @@ def editProject(projectId, secretUrl, Uname, title, Author, SourceCode, Descript
 	tagDatabase.addTagsToProject(projectId, tags)
 	return 
 
+def removeProject(projectId):
+	#remove the keywords
+	projectInfo = getProjectInfo(projectId)
+#	for utils.getKeywords(description):
+#		pass
+
+#	for tag in tags:
+#		pass
+	
+	projectDatabase.removeProject(projectId)
+	globalDatabase.removeProjectIdFromProjectList(projectId)
+
+
 #function should be run whenever redis database is cleared
 #or when you move server ect.
 def createAdminAccount():
 	userId = getNewId()
 	emailDatabase.addEmail('Admin@admin.com', userId)
 	usernameDatabase.addUsername('admin', userId)
+	
 	userDatabase.addUser(userId, 'Admin@admin.com', 'Admin', 
-							'password', '240952', True)
+							generate_password_hash('password'), '241231232130952', True)
 
 def changeUsername(userId, newUsername):
 	userInfo = userDatabase.getUserInfo(userId)
@@ -97,7 +114,7 @@ def addPendingUser(email, username, passwordHash):
 	return 0
 
 def moveFromPendingToActive(userId):
-	apiKey = '2000143204234' + getNewId()#lol security
+	apiKey = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(20))
 	userInfo = pendingUserDatabase.getUserInfo(userId)
 	pendingUserDatabase.removeUser(userId)
 	userDatabase.addUser(userId, userInfo['email'], userInfo['username'],
@@ -112,3 +129,7 @@ def getAllPendingUsers():
 		result.append( temp )
 
 	return result
+
+
+def getApiKeyUserId(apiKey):
+	return apiKeyDatabase.getApiKeyUserId(apiKey)

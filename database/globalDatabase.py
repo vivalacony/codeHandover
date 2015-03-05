@@ -17,7 +17,11 @@ def incrementGlobalCount():
 def addProjectIdToProjectList(projectId):
 	key = _globalKey(project_list_key)
 	globalRedisDB.lpush( key, projectId )
-	
+
+def removeProjectIdFromProjectList(projectId):
+	key = _globalKey(project_list_key)
+	globalRedisDB.lrem( key, 0, projectId )
+
 def getProjectListAll():
 	return getProjectListRange(0, -1)
 

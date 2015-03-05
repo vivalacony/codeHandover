@@ -73,7 +73,7 @@ li{
 			<ul class="listOfFeatures">
 				<li><a href="/changeUsername"><span>Change username</span></a></li>
 				<li><a href="/changePassword"><span>Change password</span></a></li>
-				<li><a href="#"><span>Your Api Key:</span></a><input value="{{current_user.apiKey}}"> <a href="/apiKeyDocs">- Documentation </a></li>
+				<li><a href="#"><span>Your Api Key:</span></a><input value="{{current_user.apiKey}}"> </li>
 		{%if current_user.isAdmin == 'True' %}
 				<li><a href="/addService"><span>Add New WebService</span></a></li>
 		{%endif%}

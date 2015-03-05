@@ -3,9 +3,23 @@ import redis
 from flask import Flask, render_template, request, send_file, redirect, url_for
 from flask.ext import login
 import loginLogic
+import utils
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '123456790'
+
+app.config.update(
+	DEBUG=True,
+	#EMAIL SETTINGS
+	MAIL_SERVER='smtp.gmail.com',
+	MAIL_PORT=465,
+	MAIL_USE_SSL=True,
+	MAIL_USERNAME = 'USERNAME',
+	MAIL_PASSWORD = 'PASSWORD'
+	)
+
+mail=Mail(app)
 
 postRedisDB = redis.StrictRedis( '127.0.0.1', 6379 )
 postRedisDB.flushall()
@@ -32,9 +46,6 @@ projectId = databaseFunctions.addNewProject('secretUrl', 'Uname', 'title', 'Auth
 projectId = databaseFunctions.addNewProject('secretUrl', 'Uname', 'title', 'Author', 'SourceCode', 'Description', 
 											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
 
-
-
-databaseFunctions.addPendingUser('tom@example.com', 'pippy360', 'password')
 
 AMOUNT_OF_MOST_RECENT = 15#the amount of most recent projects to show on the index page
 AMOUNT_OF_PROJECTS_PER_SEARCH_PAGE = 15
@@ -161,7 +172,8 @@ def removeServicePage(serviceId):
 	if login.current_user.isAdmin == 'False':
 		return redirect('/')
 
-	return redirect('/dashboard?success=Success: Service Added')
+	databaseFunctions.removeProject(serviceId)
+	return redirect('/?success=Success: Service removed')
 
 
 @app.route('/acceptUser/<userId>')
@@ -171,6 +183,8 @@ def acceptUserPage(userId):
 		return redirect('/')
 
 	databaseFunctions.moveFromPendingToActive(userId)
+	#msg = Message("Hello tom what's up ?", sender=("Me", "tom@79.97.58.215.com"), recipients=["tomnomnom1@gmail.com"])
+	#mail.send(msg)
 	return redirect('/dashboard?success=Success: User Accepted')
 
 @app.route('/rejectUser/<userId>')
@@ -184,7 +198,18 @@ def rejectUserPage(userId):
 
 @app.route("/api/<projectTitle>/")
 def projectTitlePage(projectTitle):
-	#get the apiKey from the get request and revese proxy the url
+	#check if the api key is valid
+
+	#get the user of the api key 
+
+	#hit the stats 
+
+	#find the project 
+
+	#get the contents from the url (with the post data sent)
+
+	#send it back to the user !
+
 	return redirect('/')
 
 @app.route("/r/<projectId>")
@@ -224,11 +249,13 @@ def loginSubmitPage():
 	userStringId = request.form.get('username')
 	password 	 = request.form.get('password')
 
-	#make sure they're non empty
+	if userStringId == None or userStringId == '':
+		return redirect('/login?error=Error: Invlaid Email or username')
+
+	if password == None or password == '':
+		return redirect('/login?error=Error: Invlaid Password')
 
 	status = loginLogic.loginUser(userStringId, password)
-	print 'status'
-	print status
 	if not status['isValid']:
 		return redirect('/login?error='+status['reason'])
 
@@ -300,13 +327,16 @@ def changePasswordSubmitPage(errors=[]):
 		newPassword1 = request.form.get('password')
 		newPassword2 = request.form.get('passwordAgain')
 
-		oldPasswordHash = oldPassword;
-		if oldPasswordHash != login.current_user.passwordHash:#the old password
+		status = utils.isValidPassword(newPassword1)
+		if not status['isValid']:
+			return redirect('/changePassword?error=Error '+status['reason'])
+
+		if not loginLogic.checkUserPassword(login.current_user, oldPassword):
 			return redirect('/changePassword?error=Error: Wrong Old password.')
 		elif newPassword1 != newPassword2:
 			return redirect('/changePassword?error=Error: New Passwords didn\'t Match')
 
-		newPasswordHash = newPassword1
+		newPasswordHash = loginLogic.hashPassword(newPassword1)
 
 		databaseFunctions.changePasswordHash(login.current_user.userId, newPasswordHash)
 		return redirect('/dashboard?success=Success: Password Changed')
@@ -317,24 +347,25 @@ def changePasswordSubmitPage(errors=[]):
 @app.route("/signupSubmit", methods=['POST'])
 def signupSubmitPage():
 
-	#FIXME: also check for empty strings !!
-	#FIXME: CHECK IF THE EMIAL IS OK
+	username = request.form.get('username')
+	status = utils.isValidUsername(username)
+	if not status['isValid']:
+		return redirect('/login?error=Error '+status['reason'])
+
 	email = request.form.get('email')
-	if email == None or len(email) > MAX_EMAIL_CHARS:
-		return redirect('/login?error=Error: Email was greater than '+str(MAX_EMAIL_CHARS)+' chars')
+	status = utils.isValidEmail(email)
+	if not status['isValid']:
+		return redirect('/login?error=Error '+status['reason'])
 
 	password = request.form.get('password')
-	if password == None or len(password) > MAX_PASSWORD_CHARS:
-		return redirect('/login?error=Error: Password was greater than '+str(MAX_PASSWORD_CHARS)+' chars')
-
-	username = request.form.get('username')
-	if username == None or len(username) > MAX_USERNAME_CHARS:
-		return redirect('/login?error=Error: Username was greater than '+str(MAX_USERNAME_CHARS)+' chars')
+	status = utils.isValidPassword(password)
+	if not status['isValid']:
+		return redirect('/login?error=Error '+status['reason'])
 
 	#hash the password and try to add it to the database
 	#for the moment we'll just keep it in glorious plain text :D
-	passwordHash = password
-
+	passwordHash = loginLogic.hashPassword(password);
+	
 	statusCode = databaseFunctions.addPendingUser(email, username, passwordHash)
 	if statusCode == -1:
 		return redirect('/login?error=Error: Username is already registered.')

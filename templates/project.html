@@ -76,15 +76,18 @@ li{
 
 <div class="contents">
 		<ul class="menuList">
-			<li><a href="#"><span class="liMenuNumber">1</span><span>Author</span></a></li>
-			<li><a href="#"><span class="liMenuNumber">2</span><span>Source Code</span></a></li>
-			<li><a href="#"><span class="liMenuNumber">3</span><span>Description</span></a></li>
-			<li><a href="#"><span class="liMenuNumber">4</span><span>Input</span></a></li>
-			<li><a href="#"><span class="liMenuNumber">5</span><span>Output</span></a></li>
-			<li><a href="#"><span class="liMenuNumber">6</span><span>Requirements</span></a></li>
-			<li><a href="#"><span class="liMenuNumber">7</span><span>Usage</span></a></li>
-			<li><a href="#"><span class="liMenuNumber">8</span><span>Example</span></a></li>
-			<li><a href="#"><span class="liMenuNumber">9</span><span>Keywords and Categories</span></a></li>
+        {%if current_user.isAdmin == 'True' %}
+          <h3><a class="pull-right" href="/removeService/{{ projectInfo['projectId'] }}">Delete this Service</a></h3>
+        {% endif %}
+			<li><a href="#"><span class="liMenuNumber">1</span> <span> - Author</span></a></li>
+			<li><a href="#"><span class="liMenuNumber">2</span> <span> - Source Code</span></a></li>
+			<li><a href="#"><span class="liMenuNumber">3</span> <span> - Description</span></a></li>
+			<li><a href="#"><span class="liMenuNumber">4</span> <span> - Input</span></a></li>
+			<li><a href="#"><span class="liMenuNumber">5</span> <span> - Output</span></a></li>
+			<li><a href="#"><span class="liMenuNumber">6</span> <span> - Requirements</span></a></li>
+			<li><a href="#"><span class="liMenuNumber">7</span> <span> - Usage</span></a></li>
+			<li><a href="#"><span class="liMenuNumber">8</span> <span> - Example</span></a></li>
+			<li><a href="#"><span class="liMenuNumber">9</span> <span> - Keywords and Categories</span></a></li>
 		</ul>
 
 		<div><span class="serviceTitle">Api</span><p>/api/{{ projectInfo.Uname }}</p></div>
