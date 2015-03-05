@@ -4,6 +4,8 @@ from flask import Flask, render_template, request, send_file, redirect, url_for
 from flask.ext import login
 import loginLogic
 import utils
+import requests
+import time
 from flask_mail import Mail, Message
 
 app = Flask(__name__)
@@ -25,25 +27,7 @@ postRedisDB = redis.StrictRedis( '127.0.0.1', 6379 )
 postRedisDB.flushall()
 databaseFunctions.createAdminAccount()
 
-projectId = databaseFunctions.addNewProject('secretUrl', 'Uname', 'title', 'Author', 'SourceCode', 'Description', 
-											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
-projectId = databaseFunctions.addNewProject('secretUrl', 'Uname', 'title', 'Author', 'SourceCode', 'Description', 
-											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
-projectId = databaseFunctions.addNewProject('secretUrl', 'Uname', 'title', 'Author', 'SourceCode', 'Description', 
-											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
-projectId = databaseFunctions.addNewProject('secretUrl', 'Uname', 'title', 'Author', 'SourceCode', 'Description', 
-											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
-projectId = databaseFunctions.addNewProject('secretUrl', 'Uname', 'title', 'Author', 'SourceCode', 'Description', 
-											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
-projectId = databaseFunctions.addNewProject('secretUrl', 'Uname', 'title', 'Author', 'SourceCode', 'Description', 
-											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
-projectId = databaseFunctions.addNewProject('secretUrl', 'Uname', 'title', 'Author', 'SourceCode', 'Description', 
-											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
-projectId = databaseFunctions.addNewProject('secretUrl', 'Uname', 'title', 'Author', 'SourceCode', 'Description', 
-											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
-projectId = databaseFunctions.addNewProject('secretUrl', 'Uname', 'title', 'Author', 'SourceCode', 'Description', 
-											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
-projectId = databaseFunctions.addNewProject('secretUrl', 'Uname', 'title', 'Author', 'SourceCode', 'Description', 
+projectId = databaseFunctions.addNewProject('http://tomnomnom.me/bobs/', 'Uname', 'title', 'Author', 'SourceCode', 'Description', 
 											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
 
 
@@ -115,7 +99,7 @@ def addServiceSubmitPage():
 	if (len(request.form.get('title')) > 0 and len(request.form.get('serviceurl')) > 0
 			and len(request.form.get('uname')) > 0):
 		databaseFunctions.addNewProject(
-			request.form.get('secreturl'), 
+			request.form.get('serviceurl'), 
 			request.form.get('uname'), 
 			request.form.get('title'), 
 			request.form.get('Author'), 
@@ -150,7 +134,7 @@ def editServiceSubmitPage():
 
 	databaseFunctions.editProject(
 			request.form.get('existingId'),
-			request.form.get('secreturl'), 
+			request.form.get('serviceurl'), 
 			request.form.get('uname'), 
 			request.form.get('title'), 
 			request.form.get('Author'), 
@@ -196,28 +180,52 @@ def rejectUserPage(userId):
 	databaseFunctions.removePendingUser(userId)
 	return redirect('/dashboard?success=Success: User Rejected')
 
-@app.route("/api/<projectTitle>/")
-def projectTitlePage(projectTitle):
+@app.route("/api/<projectTitle>/<apiKey>")
+def projectTitlePage(projectTitle, apiKey):
+
 	#check if the api key is valid
+	#apiKey = request.form.get('apikey')
+
+	if apiKey == None or apiKey == '':
+		return '/error=Error: bad api key'
 
 	#get the user of the api key 
+	userId = databaseFunctions.getApiKeyUserId(apiKey)
 
+	if userId == None or userId == '':
+		return '/error=Error: bad api key'
+
+	userInfo = databaseFunctions.getUserInfo(userId)
+	
 	#hit the stats 
 
-	#find the project 
+	#find the project
+	projectId = databaseFunctions.getTitleProjectId(projectTitle)
+	
+	if projectId == None:
+		return '/error=Error: Bad Project Name'
+	
+	projectInfo = databaseFunctions.getProjectInfo(projectId)
+	
+	databaseFunctions.addUserHit(userId, projectId)
+	databaseFunctions.addProjectHit(projectId)
 
+	try:
+		r = requests.post(projectInfo['secretUrl'], data=request.form.to_dict(flat=False))
+	except Exception, e:
+		return '/error=Error: bad secret url: ' + projectInfo.get('secretUrl')
+	
 	#get the contents from the url (with the post data sent)
 
-	#send it back to the user !
-
-	return redirect('/')
+	return r.text
 
 @app.route("/r/<projectId>")
 @app.route("/r/<projectId>/")
 @login.login_required
 def showProject(projectId):
 	projectInfo = databaseFunctions.getProjectInfo(projectId)
-	return render_template("project.html", projectInfo=projectInfo)
+	stats = databaseFunctions.getAllUserHits(login.current_user.get_id(), projectId)
+	return render_template("project.html", projectInfo=projectInfo, stats=stats)
 
 #TODO: allow editing of projects
 @app.route("/r/<projectId>/edit", methods=['POST'])

@@ -4,6 +4,38 @@
 {% endblock %}
 
 {% block head %}
+    <script type="text/javascript"
+          src="https://www.google.com/jsapi?autoload={
+            'modules':[{
+              'name':'visualization',
+              'version':'1',
+              'packages':['corechart']
+            }]
+          }"></script>
+
+    <script type="text/javascript">
+      google.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Year', 'Sales'],
+          ['1', 400],
+          ['1', 460],
+          ['1', 1120],
+          ['1', 540]
+        ]);
+
+        var options = {
+          title: 'Company Performance',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+        chart.draw(data, options);
+      }
+    </script>
 <style>
 .contentsWrapper{
 
@@ -76,7 +108,10 @@ li{
 
 <div class="contents">
 		<ul class="menuList">
+		{{ stats }}
+		<div id="curve_chart" style="width: 400px; height: 300px"></div>
         {%if current_user.isAdmin == 'True' %}
+          <h3><a class="pull-right" href="/editService/{{ projectInfo['projectId'] }}">Edit this Service</a></h3><br>	
           <h3><a class="pull-right" href="/removeService/{{ projectInfo['projectId'] }}">Delete this Service</a></h3>
         {% endif %}
 			<li><a href="#"><span class="liMenuNumber">1</span> <span> - Author</span></a></li>

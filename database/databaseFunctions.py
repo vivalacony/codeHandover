@@ -9,11 +9,17 @@ import userDatabase
 import usernameDatabase
 import emailDatabase
 from werkzeug.security import generate_password_hash, check_password_hash
+import apiKeyDatabase
+import titleDatabase
+import statsDatabase
+import time
+
 
 def addNewProject(secretUrl, Uname, title, Author, SourceCode, Description, Input, Output, 
 					Requirements,Usage,Example, tags, keywords):
 	#TODO: replace with get threadId()
 	projectId = getNewId()
+	titleDatabase.addTitle(Uname, projectId)
 	projectDatabase.addNewProject(secretUrl, Uname, projectId, title, Author, SourceCode, Description, Input, Output, 
 									Requirements,Usage,Example, tags)
 	globalDatabase.addProjectIdToProjectList(projectId)
@@ -23,8 +29,16 @@ def addNewProject(secretUrl, Uname, title, Author, SourceCode, Description, Inpu
 
 def editProject(projectId, secretUrl, Uname, title, Author, SourceCode, Description, Input, Output, 
 					Requirements,Usage,Example, tags, keywords):
+	projectInfo = getProjectInfo(projectId)
+	titleDatabase.removeTitle(projectInfo['Uname'])
+	titleDatabase.addTitle(Uname, projectId)
+
+	print 'projectInfo'
+	print projectInfo
+
 	projectDatabase.addNewProject(secretUrl, Uname, projectId, title, Author, SourceCode, 
 								Description, Input, Output, Requirements,Usage,Example, tags);
+
 	#FIXME: hm.....you should really remove all the old tags.....
 	tagDatabase.addTagsToProject(projectId, tags)
 	return 
@@ -32,12 +46,14 @@ def editProject(projectId, secretUrl, Uname, title, Author, SourceCode, Descript
 def removeProject(projectId):
 	#remove the keywords
 	projectInfo = getProjectInfo(projectId)
+
 #	for utils.getKeywords(description):
 #		pass
 
 #	for tag in tags:
 #		pass
-	
+
+	titleDatabase.removeTitle(projectInfo['Uname'])
 	projectDatabase.removeProject(projectId)
 	globalDatabase.removeProjectIdFromProjectList(projectId)
 
@@ -48,6 +64,7 @@ def createAdminAccount():
 	userId = getNewId()
 	emailDatabase.addEmail('Admin@admin.com', userId)
 	usernameDatabase.addUsername('admin', userId)
+	apiKeyDatabase.addApiKey('241231232130952', userId)
 	
 	userDatabase.addUser(userId, 'Admin@admin.com', 'Admin', 
 							generate_password_hash('password'), '241231232130952', True)
@@ -115,6 +132,7 @@ def addPendingUser(email, username, passwordHash):
 
 def moveFromPendingToActive(userId):
 	apiKey = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(20))
+	apiKeyDatabase.addApiKey(apiKey, userId)
 	userInfo = pendingUserDatabase.getUserInfo(userId)
 	pendingUserDatabase.removeUser(userId)
 	userDatabase.addUser(userId, userInfo['email'], userInfo['username'],
@@ -133,3 +151,41 @@ def getAllPendingUsers():
 
 def getApiKeyUserId(apiKey):
 	return apiKeyDatabase.getApiKeyUserId(apiKey)
+
+def addApiKey( apiKey, userId ):
+	apiKeyDatabase.addApiKey(apiKey, userId)
+
+def removeApiKey( apiKey ):
+	apiKeyDatabase.removeApiKey(apiKey)
+
+def getTitleProjectId(title):
+	return titleDatabase.getTitleProjectId(title)
+
+def addTitle( title, projectId ):
+	titleDatabase.addTitle(title, userId)
+
+def removeTitle( title ):
+	titleDatabase.removeTitle(title)
+
+
+def addUserHit(userId, projectId):
+	statId = getNewId()
+	statsDatabase.addUserHit(statId, userId, projectId, int(time.time()))
+
+def getAllUserHits(userId, projectId):
+	return statsDatabase.getAllUserHits(userId, projectId)
+
+
+def addProjectHit(projectId):
+	statId = getNewId()
+	statsDatabase.addProjectHit(statId, projectId, int(time.time()))
+
+def getAllProjectHits(projectId):
+	return statsDatabase.getAllProjectHits(projectId)
+
+def getProjectStats():
+	#keep going back in 24 hour chunks
+	#last 24 hours is "today"
+	#get the number of them between that time and add it to the whatever
+	#don't bother have the dates just "last 30 days"
+	pass
