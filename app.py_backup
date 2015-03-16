@@ -180,11 +180,11 @@ def rejectUserPage(userId):
 	databaseFunctions.removePendingUser(userId)
 	return redirect('/dashboard?success=Success: User Rejected')
 
-@app.route("/api/<projectTitle>/", methods=['POST'])
-def projectTitlePage(projectTitle):
+@app.route("/api/<projectTitle>/<apiKey>", methods=['POST'])
+def projectTitlePage(projectTitle, apiKey):
 
 	#check if the api key is valid
-	apiKey = request.form.get('apikey')
+	#apiKey = request.form.get('apikey')
 
 	if apiKey == None or apiKey == '':
 		return '/error=Error: bad api key'
