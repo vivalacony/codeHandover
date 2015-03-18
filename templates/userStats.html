@@ -1,0 +1,28 @@
+{% extends "baseLayout.html" %}
+
+{% block topLink %}
+<a href='/' class="topbarLink"> Home</a>
+{% endblock %}
+
+{% block head %}
+    <link href="/static/threadStyle.css" rel="stylesheet">
+    <style>
+.content{
+	width: 400px;
+	margin: auto;
+	text-align: center;
+}
+    </style>
+{% endblock %}
+
+{% block content %}
+
+<div class="content">
+{% for user in stats %}
+	<h1>
+		<a href="/usersStats/{{user['userId']}}">{{ user['username'] }}</a>
+	</h1>
+{% endfor %}
+</div>
+
+{% endblock %}

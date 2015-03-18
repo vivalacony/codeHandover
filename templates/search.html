@@ -6,9 +6,54 @@
 
 {% block head %}
     <link href="/static/threadStyle.css" rel="stylesheet">
+    <link href="/static/components.css" rel="stylesheet">
+    <style type="text/css">
+.threadsWrapper{
+  padding-bottom: 0px;
+}
+.recentUploadedProjectsSpan{
+  font-size: 25px;
+  padding-left: 60px;
+  color: rgb(60, 60, 60);
+}
+.selectionList{
+  padding: 10px; 
+  padding-left: 70px;
+  padding-bottom: 40px;
+}
+.selectionList li{
+  padding: 10px; 
+  list-style-type: circle;
+}
+    </style>
 {% endblock %}
 
 {% block content %}
 
-<div>here</div>
+<div>
+</div>
+
+<div class="threadsWrapper">
+{% if results|length == 0 and isEmpty == False %}
+<span class="recentUploadedProjectsSpan">Sorry No Results</span>
+{%elif isEmpty == False %}
+<span class="recentUploadedProjectsSpan">Search Results:</span>
+{% else %}
+<span class="recentUploadedProjectsSpan"></span>
+{% endif %}
+{% for project in results %}
+  <div class="thread">
+    <div class="threadFirstPost clearfix">
+      <div class="threadFirstPostRight clearfix">
+        <div class="threadFirstPostTitle">
+          <span class="threadTitle"><a href="/r/{{ project['projectId'] }}">{{ project['title'] }}</a></span>
+        </div>
+        <div class="threadFirstPostMessage">
+          {{ project['Description'] }}
+        </div>
+      </div>
+    </div>
+  </div><!--/thread-->
+{% endfor %}
+
 {% endblock %}

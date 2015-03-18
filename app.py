@@ -28,7 +28,7 @@ postRedisDB.flushall()
 databaseFunctions.createAdminAccount()
 
 projectId = databaseFunctions.addNewProject('http://54.68.182.80:5555/api/summariser/', 'Uname', 'title', 'Author', 'SourceCode', 'Description', 
-											'Input', 'Output', 'Requirements', 'Usage', 'Example', [], [])
+											'Input', 'Output', 'Requirements', 'Usage', 'Example', "tuna workmen")
 
 
 AMOUNT_OF_MOST_RECENT = 15#the amount of most recent projects to show on the index page
@@ -46,37 +46,40 @@ def showIndex(errors=[]):
 	if request.args.get('error') != None:
 		errors = [{'message':request.args.get('error'),'class':'bg-danger'}]
 
-	recentProjectsIds = databaseFunctions.getProjectListRange(0, AMOUNT_OF_MOST_RECENT)
+	recentProjectsIds = databaseFunctions.getProjectListRange(0, -1)
 	recentProjects = []
 	for projectId in recentProjectsIds:
 		recentProjects.append( databaseFunctions.getProjectInfo(projectId) )
 
 	return render_template("index.html", recentProjects=recentProjects, errors=errors)
 
-@app.route("/s/<query>")
-@app.route("/s/<query>/")
+@app.route("/searchForm")
+@app.route("/searchForm")
 @login.login_required
-def showSearch(query):
-	return showSearchPage(query, 0)
+def showSearch():
+	tags = request.args.get('q').split()
+	if tags == None or tags == []:
+		return render_template('search.html', results=[], isEmpty=True, errors = [{'message':'Invalid Search','class':'bg-danger'}])
 
-@app.route("/s/<query>/<pageNo>")
-@app.route("/s/<query>/<pageNo>/")
+	results = databaseFunctions.getSearch(tags)
+
+
+	return render_template('search.html', results=results, isEmpty=False)
+
+#getUserListAll
+@app.route('/usersStats/')
 @login.login_required
-def showSearchPage(query, pageNo):
-	pageNo = str(pageNo)
-	if int(pageNo) < 0:
-		return render_template("baseLayout.html", 
-			errors=[{'message':'bad page number !','class':'bg-danger'}])
+def userStatsPage():
+	users = databaseFunctions.getUserListAll()
+	return render_template('userStats.html', stats=users)
 
-	#get the query
-	tags = query.split()
-	
-	#//get the results with the tags
-	#get the intersec of the query	
-
-	genPageButtons(1,0)
-	
-	return render_template("search.html")
+#getUserListAll
+@app.route('/usersStats/<userId>')
+@login.login_required
+def userStatsPageId(userId):
+	#get a list of web services
+	stats = databaseFunctions.getStatsData(userId)
+	return render_template('userStatsDisplay.html', stats=stats)
 
 @app.route('/addService')
 @login.login_required
@@ -110,8 +113,7 @@ def addServiceSubmitPage():
 			request.form.get('requirements'),
 			request.form.get('usage'),
 			request.form.get('example'), 
-			[], 
-			[])
+			request.form.get('tags'))
 		return redirect('/dashboard?success=Success: Service Added')
 	else:
 		return redirect('/addService?error=Error: Bad Title')
@@ -145,7 +147,6 @@ def editServiceSubmitPage():
 			request.form.get('requirements'),
 			request.form.get('usage'),
 			request.form.get('example'), 
-			[], 
 			[])
 
 	return redirect('/dashboard?success=Success: Service Edited')
@@ -210,6 +211,45 @@ def projectTitlePage(projectTitle):
 	databaseFunctions.addUserHit(userId, projectId)
 	databaseFunctions.addProjectHit(projectId)
 	print request.form.to_dict(flat=False)
+	try:
+		r = requests.post(projectInfo['secretUrl'], data=request.form.to_dict(flat=False))
+	except Exception, e:
+		return '/error=Error: bad secret url: ' + projectInfo.get('secretUrl')
+	
+	#get the contents from the url (with the post data sent)
+
+	return r.text
+
+@app.route("/api/<projectTitle>/<apiKey>")
+def testProjectTitlePage(projectTitle, apiKey):
+
+	#check if the api key is valid
+	#apiKey = request.form.get('apikey')
+
+	if apiKey == None or apiKey == '':
+		return '/error=Error: bad api key'
+
+	#get the user of the api key 
+	userId = databaseFunctions.getApiKeyUserId(apiKey)
+
+	if userId == None or userId == '':
+		return '/error=Error: bad api key'
+
+	userInfo = databaseFunctions.getUserInfo(userId)
+	
+	#hit the stats 
+
+	#find the project
+	projectId = databaseFunctions.getTitleProjectId(projectTitle)
+	
+	if projectId == None:
+		return '/error=Error: Bad Project Name'
+	
+	projectInfo = databaseFunctions.getProjectInfo(projectId)
+	
+	databaseFunctions.addUserHit(userId, projectId)
+	databaseFunctions.addProjectHit(projectId)
+
 	try:
 		r = requests.post(projectInfo['secretUrl'], data=request.form.to_dict(flat=False))
 	except Exception, e:

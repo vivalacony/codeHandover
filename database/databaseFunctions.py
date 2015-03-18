@@ -12,29 +12,44 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import apiKeyDatabase
 import titleDatabase
 import statsDatabase
+import keywordDatabase
 import time
 
 
 def addNewProject(secretUrl, Uname, title, Author, SourceCode, Description, Input, Output, 
-					Requirements,Usage,Example, tags, keywords):
+					Requirements,Usage,Example, tags):
 	#TODO: replace with get threadId()
 	projectId = getNewId()
+	tags = tags.split()
 	titleDatabase.addTitle(Uname, projectId)
 	projectDatabase.addNewProject(secretUrl, Uname, projectId, title, Author, SourceCode, Description, Input, Output, 
 									Requirements,Usage,Example, tags)
 	globalDatabase.addProjectIdToProjectList(projectId)
-	tagDatabase.addTagsToProject(projectId, tags)
+
+	#tagDatabase.addTagsToProject(projectId, tags)
+	addKeywordsToProject(projectId, tags)
+	addKeywordsToProject(projectId, title.split() )
+	addKeywordsToProject(projectId, Description.split())
+
 	#TODO: put keyword database stuff here
 	return projectId
 
+def getSearch(keywordlist):
+	result = []
+	projectIds = getIntersection(keywordlist)
+	for projectId in projectIds:
+		if getProjectInfo(projectId) != None and getProjectInfo(projectId) != {}:
+			result.append(getProjectInfo(projectId))
+	return result
+
+def getIntersection(keywordlist):
+	return keywordDatabase.getIntersection(keywordlist)
+
 def editProject(projectId, secretUrl, Uname, title, Author, SourceCode, Description, Input, Output, 
-					Requirements,Usage,Example, tags, keywords):
+					Requirements,Usage,Example, tags):
 	projectInfo = getProjectInfo(projectId)
 	titleDatabase.removeTitle(projectInfo['Uname'])
 	titleDatabase.addTitle(Uname, projectId)
-
-	print 'projectInfo'
-	print projectInfo
 
 	projectDatabase.addNewProject(secretUrl, Uname, projectId, title, Author, SourceCode, 
 								Description, Input, Output, Requirements,Usage,Example, tags);
@@ -90,7 +105,9 @@ def getUsernameUserId(username):
 	return usernameDatabase.getUsernameUserId(username)
 
 def getUserInfo(userId):
-	return userDatabase.getUserInfo(userId)
+	userStuff = userDatabase.getUserInfo(userId)
+	userStuff['userId'] = userId
+	return userStuff
 	
 def getPendingUserInfo(userId):
 	return pendingUserDatabase.getUserInfo(userId)
@@ -130,11 +147,38 @@ def addPendingUser(email, username, passwordHash):
 	pendingUserDatabase.addUser(userId, email, username, passwordHash)
 	return 0
 
+def addKeywordsToProject(projectId, keywordList):
+	keywordDatabase.addKeywordsToProject(projectId, keywordList)
+
+def getUserListAll():
+	result = []
+	userList = globalDatabase.getUserListAll()
+	for userId in userList:
+		userInfo = getUserInfo(userId)
+		userInfo['userId'] = userId
+		result.append(userInfo)
+
+
+	return result
+
+def getStatsData(userId):
+	result = []
+	projectList = getProjectListRange(0,-1)
+	for projectId in projectList:
+		#get the project name and the stats
+		statsStuff = statsDatabase.getAllUserHits(userId, projectId)
+		projectStuff = getProjectInfo(projectId)
+		result.append( [projectStuff['title'], len(statsStuff) ] )
+
+	return result	
+
+
 def moveFromPendingToActive(userId):
 	apiKey = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(20))
 	apiKeyDatabase.addApiKey(apiKey, userId)
 	userInfo = pendingUserDatabase.getUserInfo(userId)
 	pendingUserDatabase.removeUser(userId)
+	globalDatabase.addToUserList(userId)
 	userDatabase.addUser(userId, userInfo['email'], userInfo['username'],
 						 userInfo['passwordHash'], apiKey, False)
 
@@ -147,7 +191,6 @@ def getAllPendingUsers():
 		result.append( temp )
 
 	return result
-
 
 def getApiKeyUserId(apiKey):
 	return apiKeyDatabase.getApiKeyUserId(apiKey)

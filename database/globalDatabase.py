@@ -4,6 +4,7 @@ keyFormat = 'global_{0}'
 globalRedisDB = redis.StrictRedis( '127.0.0.1', 6379 )#TODO: move to config file
 global_count_key = 'global_count'
 project_list_key = 'project_list'
+user_list_key = 'user_list'
 
 def getGlobalCount():
 	if globalRedisDB.get(global_count_key) == None:
@@ -13,6 +14,18 @@ def getGlobalCount():
 	
 def incrementGlobalCount():
 	globalRedisDB.incr(global_count_key)
+
+def addToUserList(userId):
+	key = _globalKey(user_list_key)
+	globalRedisDB.lpush( key, userId )
+
+def removeFromUserList(userId):
+	key = _globalKey(user_list_key)
+	globalRedisDB.lrem( key, 0, userId )
+
+def getUserListAll():
+	key = _globalKey(user_list_key)
+	return globalRedisDB.lrange(key, 0, -1)
 
 def addProjectIdToProjectList(projectId):
 	key = _globalKey(project_list_key)

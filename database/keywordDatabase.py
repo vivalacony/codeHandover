@@ -8,24 +8,24 @@ def addKeywordsToProject( projectId, tagsList ):
     tagsList = [ tagsList ]
 
   for tag in tagsList:
-    key = _tagKey(tag)
+    key = _tagKey(tag.lower())
     keywordRedisDB.sadd( key, projectId )
 
 def getIntersection( keywords ):
   fixed = []
   for keyword in keywords:
-    key = _tagKey( keyword )
+    key = _tagKey( keyword.lower() )
     fixed.append( key )
 
   return keywordRedisDB.sinter( fixed )
 
 def removeFileIdFromTag( projectId, tag ):
   #TODO: what happens if it doesn't exist ??
-  key = _tagKey(tag)
+  key = _tagKey(tag.lower())
   keywordRedisDB.srem( key, projectId )
 
 def getMatchingProjects( keyword ):
-  key = _tagKey(keyword)
+  key = _tagKey(keyword.lower())
   return keywordRedisDB.smembers( key )
 
 def _tagKey(tag):

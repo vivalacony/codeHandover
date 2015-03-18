@@ -4,38 +4,7 @@
 {% endblock %}
 
 {% block head %}
-    <script type="text/javascript"
-          src="https://www.google.com/jsapi?autoload={
-            'modules':[{
-              'name':'visualization',
-              'version':'1',
-              'packages':['corechart']
-            }]
-          }"></script>
-
-    <script type="text/javascript">
-      google.setOnLoadCallback(drawChart);
-
-      function drawChart() {
-        var data = google.visualization.arrayToDataTable([
-          ['Year', 'Sales'],
-          ['1', 400],
-          ['1', 460],
-          ['1', 1120],
-          ['1', 540]
-        ]);
-
-        var options = {
-          title: 'Company Performance',
-          curveType: 'function',
-          legend: { position: 'bottom' }
-        };
-
-        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-
-        chart.draw(data, options);
-      }
-    </script>
+    
 <style>
 .contentsWrapper{
 
@@ -88,17 +57,40 @@ tr{
 	margin-left: 20px;
 	width: 200px;
 }
+.menuList{
+	background-color: rgba(255, 255, 255, 0.23);
+	padding-bottom: 30px;
+}
+ul{
+
+}
 li{
 	text-align: left;
+	list-style: none;
+	padding-bottom: 3px;
 }
 .contentsWrapper{
 }
+.liMenuNumber{
+	padding-right: 10px;
+}
 .serviceTitle{
-	border-bottom: 1px solid rgba(0,0,0,.5);
+	border-bottom: 1px solid rgba(0,0,0,.3);
 	display: block;
 	width: 100%;
-	color: rgba(0,0,0,.7);
-	font-size: 18px;
+	color: rgba(0,0,0,.5);
+	font-size: 26px;
+	position: relative;
+}
+.serviceDataSTuff{
+	padding-left: 20px;
+}
+.serviceTitleAndStuffWrapper{
+	padding-bottom: 15px;
+}
+.pageTitle{
+	text-align: center;
+	font-size: 45px;
 }
 </style>
 {% endblock %}
@@ -107,36 +99,36 @@ li{
 <div class="contentsWrapper">
 
 <div class="contents">
+		{%if current_user.isAdmin == 'True' %}
+			<a class="pull-right" href="/editService/{{ projectInfo['projectId'] }}">Edit this Service</a>
+			<br>	
+			<br>	
+			<a class="pull-right" href="/removeService/{{ projectInfo['projectId'] }}">Delete this Service</a>
+		{% endif %}
+        <br>
+		<h1 class="pageTitle">{{ projectInfo.title }}</h1>
 		<ul class="menuList">
-		{{ stats }}
-		<div id="curve_chart" style="width: 400px; height: 300px"></div>
-        {%if current_user.isAdmin == 'True' %}
-          <h3><a class="pull-right" href="/editService/{{ projectInfo['projectId'] }}">Edit this Service</a></h3><br>	
-          <h3><a class="pull-right" href="/removeService/{{ projectInfo['projectId'] }}">Delete this Service</a></h3>
-        {% endif %}
-			<li><a href="#"><span class="liMenuNumber">1</span> <span> - Author</span></a></li>
-			<li><a href="#"><span class="liMenuNumber">2</span> <span> - Source Code</span></a></li>
-			<li><a href="#"><span class="liMenuNumber">3</span> <span> - Description</span></a></li>
-			<li><a href="#"><span class="liMenuNumber">4</span> <span> - Input</span></a></li>
-			<li><a href="#"><span class="liMenuNumber">5</span> <span> - Output</span></a></li>
-			<li><a href="#"><span class="liMenuNumber">6</span> <span> - Requirements</span></a></li>
-			<li><a href="#"><span class="liMenuNumber">7</span> <span> - Usage</span></a></li>
-			<li><a href="#"><span class="liMenuNumber">8</span> <span> - Example</span></a></li>
-			<li><a href="#"><span class="liMenuNumber">9</span> <span> - Keywords and Categories</span></a></li>
+			<li><a href="#"><span class="liMenuNumber">1. </span> <span>  Author</span></a></li>
+			<li><a href="#"><span class="liMenuNumber">2. </span> <span>  Source Code</span></a></li>
+			<li><a href="#"><span class="liMenuNumber">3. </span> <span>  Description</span></a></li>
+			<li><a href="#"><span class="liMenuNumber">4. </span> <span>  Input</span></a></li>
+			<li><a href="#"><span class="liMenuNumber">5. </span> <span>  Output</span></a></li>
+			<li><a href="#"><span class="liMenuNumber">6. </span> <span>  Requirements</span></a></li>
+			<li><a href="#"><span class="liMenuNumber">7. </span> <span>  Usage</span></a></li>
+			<li><a href="#"><span class="liMenuNumber">8. </span> <span>  Example</span></a></li>
+			<li><a href="#"><span class="liMenuNumber">9. </span> <span>  Keywords and Categories</span></a></li>
 		</ul>
 
-		<div><span class="serviceTitle">Api</span><p>/api/{{ projectInfo.Uname }}</p></div>
-		<div><span class="serviceTitle">title</span><p>{{ projectInfo.title }}</p></div>
-		<div><span class="serviceTitle">Uname</span><p>{{ projectInfo.Uname }}</p></div>
-		<div><span class="serviceTitle">Author</span><p>{{ projectInfo.Author }}</p></div>
-		<div><span class="serviceTitle">SourceCode</span><p>{{ projectInfo.SourceCode }}</p></div>
-		<div><span class="serviceTitle">Description</span><p>{{ projectInfo.Description }}</p></div>
-		<div><span class="serviceTitle">Input</span><p>{{ projectInfo.Input }}</p></div>
-		<div><span class="serviceTitle">Output</span><p>{{ projectInfo.Output }}</p></div>
-		<div><span class="serviceTitle">Requirements</span><p>{{ projectInfo.Requirements }}</p></div>
-		<div><span class="serviceTitle">Usage</span><p>{{ projectInfo.Usage }}</p></div>
-		<div><span class="serviceTitle">Example</span><p>{{ projectInfo.Example }}</p></div>
-		<div><span class="serviceTitle">Tags</span><p>{{ projectInfo.tags }}</p></div>
+		<div class="serviceTitleAndStuffWrapper"><span class="serviceTitle">Unique Api Url</span><p class="serviceDataSTuff"><a href="/api/{{ projectInfo.Uname }}">/api/{{ projectInfo.Uname }}</a></p></div>
+		<div class="serviceTitleAndStuffWrapper"><span class="serviceTitle">Author</span><p class="serviceDataSTuff">{{ projectInfo.Author }}</p></div>
+		<div class="serviceTitleAndStuffWrapper"><span class="serviceTitle">SourceCode</span><p class="serviceDataSTuff">{{ projectInfo.SourceCode }}</p></div>
+		<div class="serviceTitleAndStuffWrapper"><span class="serviceTitle">Description</span><p class="serviceDataSTuff">{{ projectInfo.Description }}</p></div>
+		<div class="serviceTitleAndStuffWrapper"><span class="serviceTitle">Input</span><p class="serviceDataSTuff">{{ projectInfo.Input }}</p></div>
+		<div class="serviceTitleAndStuffWrapper"><span class="serviceTitle">Output</span><p class="serviceDataSTuff">{{ projectInfo.Output }}</p></div>
+		<div class="serviceTitleAndStuffWrapper"><span class="serviceTitle">Requirements</span><p class="serviceDataSTuff">{{ projectInfo.Requirements }}</p></div>
+		<div class="serviceTitleAndStuffWrapper"><span class="serviceTitle">Usage</span><p class="serviceDataSTuff">{{ projectInfo.Usage }}</p></div>
+		<div class="serviceTitleAndStuffWrapper"><span class="serviceTitle">Example</span><p class="serviceDataSTuff">{{ projectInfo.Example }}</p></div>
+		<div class="serviceTitleAndStuffWrapper"><span class="serviceTitle">Tags</span><p class="serviceDataSTuff">{{ projectInfo.tags }}</p></div>
 	</div>
 
 </div>
