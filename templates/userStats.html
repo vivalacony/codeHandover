@@ -18,9 +18,9 @@
 {% block content %}
 
 <div class="content">
-{% for user in stats %}
+{% for user, c in packed %}
 	<h1>
-		<a href="/usersStats/{{user['userId']}}">{{ user['username'] }}</a>
+		<a href="/usersStats/{{user['userId']}}">{{ user['username'] }}</a> - {{c}}
 	</h1>
 {% endfor %}
 </div>

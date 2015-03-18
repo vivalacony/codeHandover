@@ -70,8 +70,14 @@ def showSearch():
 @app.route('/usersStats/')
 @login.login_required
 def userStatsPage():
+	count = []
+	packed = []
 	users = databaseFunctions.getUserListAll()
-	return render_template('userStats.html', stats=users)
+	for user in users:
+		count.append( len(databaseFunctions.getAllProjectHits(user['userId'])) )
+		packed.append([user, len(databaseFunctions.getAllProjectHits(user['userId']))])
+
+	return render_template('userStats.html', packed=packed)
 
 #getUserListAll
 @app.route('/usersStats/<userId>')
@@ -134,6 +140,22 @@ def editServiceSubmitPage():
 	if login.current_user.isAdmin == 'False':
 		return redirect('/')
 
+	projectInfo = databaseFunctions.getProjectInfo(request.form.get('existingId'))
+	#remove the stuff
+#	print "projectInfo['title'].split()"
+#	print projectInfo['title'].split()
+	deleteProjectFromTags(projectId, projectInfo['title'].split())
+#	print "projectInfo['Description'].split()"
+#	print projectInfo['Description'].split()
+	deleteProjectFromTags(projectId, projectInfo['Description'].split())
+#	print "projectInfo['tags']"
+#	print projectInfo['tags']
+	deleteProjectFromTags(projectId, projectInfo['tags'])
+
+
+	tagsList = request.form.get('tags')#do the title and other stuff !!!!
+	databaseFunctions.deleteProjectFromTags(request.form.get('existingId'), tagsList)
+
 	databaseFunctions.editProject(
 			request.form.get('existingId'),
 			request.form.get('serviceurl'), 
@@ -147,7 +169,7 @@ def editServiceSubmitPage():
 			request.form.get('requirements'),
 			request.form.get('usage'),
 			request.form.get('example'), 
-			[])
+			request.form.get('tags'))
 
 	return redirect('/dashboard?success=Success: Service Edited')
 
@@ -209,7 +231,7 @@ def projectTitlePage(projectTitle):
 	projectInfo = databaseFunctions.getProjectInfo(projectId)
 	
 	databaseFunctions.addUserHit(userId, projectId)
-	databaseFunctions.addProjectHit(projectId)
+	databaseFunctions.addProjectHit(userId)
 	print request.form.to_dict(flat=False)
 	try:
 		r = requests.post(projectInfo['secretUrl'], data=request.form.to_dict(flat=False))
@@ -248,7 +270,7 @@ def testProjectTitlePage(projectTitle, apiKey):
 	projectInfo = databaseFunctions.getProjectInfo(projectId)
 	
 	databaseFunctions.addUserHit(userId, projectId)
-	databaseFunctions.addProjectHit(projectId)
+	databaseFunctions.addProjectHit(userId)
 
 	try:
 		r = requests.post(projectInfo['secretUrl'], data=request.form.to_dict(flat=False))

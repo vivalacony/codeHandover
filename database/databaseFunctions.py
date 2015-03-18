@@ -68,6 +68,16 @@ def removeProject(projectId):
 #	for tag in tags:
 #		pass
 
+#	print "projectInfo['title'].split()"
+#	print projectInfo['title'].split()
+	deleteProjectFromTags(projectId, projectInfo['title'].split())
+#	print "projectInfo['Description'].split()"
+#	print projectInfo['Description'].split()
+	deleteProjectFromTags(projectId, projectInfo['Description'].split())
+#	print "projectInfo['tags']"
+#	print projectInfo['tags']
+	deleteProjectFromTags(projectId, projectInfo['tags'])
+
 	titleDatabase.removeTitle(projectInfo['Uname'])
 	projectDatabase.removeProject(projectId)
 	globalDatabase.removeProjectIdFromProjectList(projectId)
@@ -160,6 +170,11 @@ def getUserListAll():
 
 
 	return result
+
+def deleteProjectFromTags(projectId, tagsList):
+	for tag in tagsList:
+		keywordDatabase.removeFileIdFromTag( projectId, tag )
+
 
 def getStatsData(userId):
 	result = []

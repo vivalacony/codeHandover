@@ -60,6 +60,7 @@ tr{
 .menuList{
 	background-color: rgba(255, 255, 255, 0.23);
 	padding-bottom: 30px;
+	padding-top: 30px;
 }
 ul{
 
@@ -108,15 +109,15 @@ li{
         <br>
 		<h1 class="pageTitle">{{ projectInfo.title }}</h1>
 		<ul class="menuList">
-			<li><a href="#"><span class="liMenuNumber">1. </span> <span>  Author</span></a></li>
-			<li><a href="#"><span class="liMenuNumber">2. </span> <span>  Source Code</span></a></li>
-			<li><a href="#"><span class="liMenuNumber">3. </span> <span>  Description</span></a></li>
-			<li><a href="#"><span class="liMenuNumber">4. </span> <span>  Input</span></a></li>
-			<li><a href="#"><span class="liMenuNumber">5. </span> <span>  Output</span></a></li>
-			<li><a href="#"><span class="liMenuNumber">6. </span> <span>  Requirements</span></a></li>
-			<li><a href="#"><span class="liMenuNumber">7. </span> <span>  Usage</span></a></li>
-			<li><a href="#"><span class="liMenuNumber">8. </span> <span>  Example</span></a></li>
-			<li><a href="#"><span class="liMenuNumber">9. </span> <span>  Keywords and Categories</span></a></li>
+			<li><span class="liMenuNumber">1. </span><a href="#"> <span>  Author</span></a></li>
+			<li><span class="liMenuNumber">2. </span><a href="#"> <span>  Source Code</span></a></li>
+			<li><span class="liMenuNumber">3. </span><a href="#"> <span>  Description</span></a></li>
+			<li><span class="liMenuNumber">4. </span><a href="#"> <span>  Input</span></a></li>
+			<li><span class="liMenuNumber">5. </span><a href="#"> <span>  Output</span></a></li>
+			<li><span class="liMenuNumber">6. </span><a href="#"> <span>  Requirements</span></a></li>
+			<li><span class="liMenuNumber">7. </span><a href="#"> <span>  Usage</span></a></li>
+			<li><span class="liMenuNumber">8. </span><a href="#"> <span>  Example</span></a></li>
+			<li><span class="liMenuNumber">9. </span><a href="#"> <span>  Keywords and Categories</span></a></li>
 		</ul>
 
 		<div class="serviceTitleAndStuffWrapper"><span class="serviceTitle">Unique Api Url</span><p class="serviceDataSTuff"><a href="/api/{{ projectInfo.Uname }}">/api/{{ projectInfo.Uname }}</a></p></div>
@@ -127,9 +128,18 @@ li{
 		<div class="serviceTitleAndStuffWrapper"><span class="serviceTitle">Output</span><p class="serviceDataSTuff">{{ projectInfo.Output }}</p></div>
 		<div class="serviceTitleAndStuffWrapper"><span class="serviceTitle">Requirements</span><p class="serviceDataSTuff">{{ projectInfo.Requirements }}</p></div>
 		<div class="serviceTitleAndStuffWrapper"><span class="serviceTitle">Usage</span><p class="serviceDataSTuff">{{ projectInfo.Usage }}</p></div>
-		<div class="serviceTitleAndStuffWrapper"><span class="serviceTitle">Example</span><p class="serviceDataSTuff">{{ projectInfo.Example }}</p></div>
-		<div class="serviceTitleAndStuffWrapper"><span class="serviceTitle">Tags</span><p class="serviceDataSTuff">{{ projectInfo.tags }}</p></div>
-	</div>
+		<div class="serviceTitleAndStuffWrapper">
+			<span class="serviceTitle">Example</span>
+			<p class="serviceDataSTuff">{{ projectInfo.Example }}</p>
+		</div>
+		<div class="serviceTitleAndStuffWrapper"><span class="serviceTitle">Tags</span>
+			<p class="serviceDataSTuff">
+				{% for tag in projectInfo.tags %}
+					<span class=""> <a href="/searchForm?q={{tag}}">{{tag}}</a>, </span>
+				{% endfor %}
+			</p>
+			</div>
+		</div>
 
 </div>
 {% endblock %}
