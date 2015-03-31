@@ -1,4 +1,5 @@
 import redis
+import MySQLdb
 
 PENDING_USER_LIST_KEY = 'list_of_pending_users'
 
@@ -16,11 +17,20 @@ def addUser(userId, email, username, passwordHash):
 
   key = _pendingKey(userId)
   pendingRedisDB.hmset(key, user)
+  
+  #db=MySQLdb.connect(host="localhost",user="root",passwd="woot",db="TestDB")
+  
+	#cur = db.cursor()
+	#cur.execute("INSERT INTO CNGL_User_Tbl (EmailAddress, UserName,Password) VALUES('" + email + "','"+username+"','"+passwordHash+"')")
 
 def removeUser(userId):
   _removeFromPendingUserList(userId)
   key = _pendingKey(userId)
   pendingRedisDB.delete(key)
+  #db=MySQLdb.connect(host="localhost",user="root",passwd="woot",db="TestDB")
+  
+	#cur = db.cursor()
+	#cur.execute("DELETE FROM CNGL_User_Tbl WHERE UserID = " + userId)
 
 def getUserInfo(userId):
   key = _pendingKey(userId)
